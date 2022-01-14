@@ -1,20 +1,17 @@
 const db = require("./utils/db");
 const path = require("path");
 const fs = require("fs");
-const zlib = require("zlib");
-const tar = require("tar");
-const fstream = require("fstream");
 const zipper = require("zip-local");
 const config = require("./config-server");
 const { exit } = require("process");
 
-//写入文件 遇到目录没创建就创建 遇到文件已存在就覆盖
-const writeFileRecursive = function (path, buffer, callback) {
-  let lastPath = path.substring(0, path.lastIndexOf("/"));
-  fs.mkdir(lastPath, { recursive: true }, (err) => {
+const writeFileRecursive = function (targetPath, filename, buffer, callback) {
+  fs.mkdir(targetPath, { recursive: true }, (err) => {
     if (err) return callback(err);
-    fs.writeFile(path, buffer, function (err) {
+
+    fs.writeFile(path.join(targetPath, filename), buffer, function (err) {
       if (err) return callback(err);
+
       return callback(null);
     });
   });
@@ -69,50 +66,67 @@ async function getSourceByCID(cid) {
           let cnt = 0;
 
           await res.forEach(function (item) {
-            var dest_file = path.join(
+            const targetPath = path.join(
               config.dataPath,
               cid.toString(),
-              pid[item.problem_id],
-              cid.toString() +
-                "-" +
-                pid[item.problem_id] +
-                "-" +
-                status[item.result] +
-                "-" +
-                item.in_date +
-                ".cpp"
+              pid[item.problem_id]
             );
 
-            writeFileRecursive(dest_file, item.source, function () {
-              cnt += 1;
-              if (cnt == res.length) {
-                zipper.zip(
-                  path.join(config.dataPath, cid.toString()),
-                  function (error, zipped) {
-                    if (!error) {
-                      zipped.compress(); // compress before exporting
+            const filename =
+              cid.toString() +
+              "-" +
+              pid[item.problem_id] +
+              "-" +
+              status[item.result] +
+              "-" +
+              item.in_date +
+              ".cpp";
 
-                      var buff = zipped.memory(); // get the zipped file as a Buffer
-                      // or save the zipped file to disk
-                      zipped.save(
-                        path.join(
-                          config.dataPath,
-                          "./" + cid.toString() + ".zip"
-                        ),
-                        function (error) {
-                          if (!error) {
-                            console.log("Ziped files successfully !");
+            console.log(path.join(targetPath, filename));
+
+            writeFileRecursive(
+              targetPath,
+              filename,
+              item.source,
+              function (err) {
+                if (err) {
+                  console.error(err);
+                  exit(1);
+                }
+
+                cnt += 1;
+
+                if (cnt == res.length) {
+                  zipper.zip(
+                    path.join(config.dataPath, cid.toString()),
+                    function (error, zipped) {
+                      if (!error) {
+                        // compress before exporting
+                        zipped.compress();
+
+                        // get the zipped file as a Buffer
+                        var buff = zipped.memory();
+
+                        // or save the zipped file to disk
+                        zipped.save(
+                          path.join(
+                            config.dataPath,
+                            "./" + cid.toString() + ".zip"
+                          ),
+                          function (error) {
+                            if (!error) {
+                              console.log("Ziped files successfully !");
+                            }
                           }
-                        }
-                      );
-                    } else {
-                      console.log(error);
+                        );
+                      } else {
+                        console.log(error);
+                      }
                     }
-                  }
-                );
+                  );
+                }
               }
-            });
-            console.log(dest_file);
+            );
           });
         },
       });

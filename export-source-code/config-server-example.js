@@ -1,5 +1,5 @@
 var config = {
-  dataPath: "./data",
+  dataPath: "data",
   cids: [1, 2],
   mysql: {
     connectionLimit: 100,
