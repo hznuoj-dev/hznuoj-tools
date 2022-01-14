@@ -95,7 +95,10 @@ async function getSourceByCID(cid) {
                       var buff = zipped.memory(); // get the zipped file as a Buffer
                       // or save the zipped file to disk
                       zipped.save(
-                        "./" + cid.toString() + ".zip",
+                        path.join(
+                          config.dataPath,
+                          "./" + cid.toString() + ".zip"
+                        ),
                         function (error) {
                           if (!error) {
                             console.log("Ziped files successfully !");
