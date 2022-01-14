@@ -1,4 +1,6 @@
 var config = {
+  dataPath: "./data",
+  cids: [1, 2],
   mysql: {
     connectionLimit: 100,
     host: "",

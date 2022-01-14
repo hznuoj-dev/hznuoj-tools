@@ -1,9 +1,9 @@
-var CONFIG = require("../config-server");
+var config = require("../config-server");
 var mysql = require("mysql");
 var async = require("async");
 
 module.exports = {
-  config: CONFIG.mysql,
+  config: config.mysql,
   pool: null,
   /**
    * 创建连接池
