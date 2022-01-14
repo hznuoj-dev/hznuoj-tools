@@ -82,8 +82,6 @@ async function getSourceByCID(cid) {
               item.in_date +
               ".cpp";
 
-            console.log(path.join(targetPath, filename));
-
             writeFileRecursive(
               targetPath,
               filename,
@@ -93,6 +91,12 @@ async function getSourceByCID(cid) {
                   console.error(err);
                   exit(1);
                 }
+
+                console.log(
+                  "write files successfully. [path=" +
+                    path.join(targetPath, filename) +
+                    "]"
+                );
 
                 cnt += 1;
 
