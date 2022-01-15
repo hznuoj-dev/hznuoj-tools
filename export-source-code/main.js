@@ -85,7 +85,7 @@ async function getSourceByCID(cid) {
             writeFileRecursive(
               targetPath,
               filename,
-              item.source,
+              item.source ?? "",
               function (err) {
                 if (err) {
                   console.error(err);
