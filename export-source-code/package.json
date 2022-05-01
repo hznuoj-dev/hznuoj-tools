@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "async": "^3.2.0",
+    "async": "^3.2.2",
     "fs": "^0.0.1-security",
     "fstream": "^1.0.12",
     "mysql": "^2.18.1",
