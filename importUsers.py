@@ -38,7 +38,11 @@ def main():
     else:
       item = {}
       for j in range(len(headers)):
-        item[headers[j]] = _row[j]
+        if _row[j] == None: continue
+        if _row[j] == 1:
+          item["location"] = headers[j]
+        else:
+          item[headers[j]] = _row[j]
       res["contestUserList"].append(item)
 
     i += 1
